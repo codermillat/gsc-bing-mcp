@@ -1,38 +1,37 @@
 # Active Context
 
 ## Current Work Focus
-v0.2.0 — Major enhancement: 22 tools total (12 GSC + 10 Bing), date range support, robust parser, new Bing endpoints.
+v0.2.1 — Bugfix release. 23 tools total (11 GSC + 11 Bing + 1 util). MCP verified live with gsc_list_sites, gsc_top_queries, gsc_top_pages, gsc_all_queries.
 
-## Session Summary (2026-02-18 — v0.2.0 Release)
+## Session Summary (2026-02-18 — v0.2.0 → v0.2.1)
 
-### What Changed
+### v0.2.1 Bugfixes (2026-02-18)
+- **Device dimension**: `_extract_dim_value()` no longer short-circuits on falsy strings — check `isinstance(dim_info[0], str)` only (avoids skipping valid values like `"0"`).
+- **Metric type validation**: In `_parse_single_row()`, validate `metric_array[8]` is `int` before comparing to 5/6/7/8; skip invalid entries to avoid silent data loss.
+- **gsc_index_coverage loop**: Replaced invalid `for item in raw if ... else ...` with `items_to_iterate = ... ; for item in items_to_iterate:` (valid Python).
 
-#### Infrastructure Fixes
-- Fixed version mismatch (`__init__.py` was `0.1.1`, now synced to `0.2.0`)
-- Rewrote `_parse_ndafwb_breakdown()` with robust multi-row extraction
-- Added `_extract_metric_value()` helper that scans arrays for actual values instead of fragile index-based access
-- Added `_parse_single_row()` for clean row parsing with proper unwrapping of nested shapes
-
-#### Date Range Support
-- Added `start_date` / `end_date` optional params to `query_search_analytics()`
-- Added `_date_to_timestamp_ms()` and `_build_date_filter()` helpers
-- Propagated date range params to all 4 GSC performance tools:
-  - `gsc_performance_trend`, `gsc_top_queries`, `gsc_top_pages`, `gsc_search_analytics`
+### v0.2.0 Major Changes (2026-02-18)
+- **Dimension codes**: page=[3], country=[4] (were incorrectly swapped; page was [4] returning country data).
+- **Dimension value extraction**: Added `_extract_dim_value()` — query at dim_info[0], page at dim_info[40], country at dim_info[17] (dict format).
+- **Metric extraction**: `_extract_metric_value()` skips index 8 (metric type code) when scanning for CTR/position to avoid returning 7.0/8.0 as values.
+- **Date range**: Client-side filtering only; GSC batchexecute does not accept custom date range in request — fetch full OLiH4d then filter rows by start_date/end_date.
+- **gsc_all_queries**: Scans all AF_initDataCallback blocks for dimension code [2], uses `_parse_ndafwb_breakdown(data, ["query"])` on the matching block (e.g. ds:17).
 
 #### New GSC Tools (+3)
-- `gsc_all_queries` — Scrapes ALL queries from GSC performance page HTML (bypasses RPC pagination)
-- `gsc_index_coverage` — Detailed index coverage stats via `czrWJf` RPC
-- `gsc_query_pages` — Query-to-page correlations via multi-dimension `nDAfwb` breakdown
+- `gsc_all_queries` — All queries from performance page HTML (ds:17 block).
+- `gsc_index_coverage` — Index coverage via czrWJf.
+- `gsc_query_pages` — Query-to-page via nDAfwb [query, page].
 
 #### New Bing Tools (+7)
-- `bing_url_info` — URL inspection (crawl date, HTTP status, indexed status)
-- `bing_page_stats` — Top pages with traffic metrics
-- `bing_submit_url` — Submit single URL for indexing
-- `bing_submit_url_batch` — Submit multiple URLs for indexing
-- `bing_crawl_issues` — Crawl issues and errors
-- `bing_url_submission_quota` — Check daily URL submission quota
-- `bing_link_counts` — Inbound link data
+- `bing_url_info`, `bing_page_stats`, `bing_submit_url`, `bing_submit_url_batch`, `bing_crawl_issues`, `bing_url_submission_quota`, `bing_link_counts`.
 
 #### Existing Tool Improvements
-- `gsc_top_pages` — Now supports `limit=0` to return all pages
-- `gsc_list_sites` — Now includes `propertyType` (Domain property vs URL prefix)
+- `gsc_list_sites` — Includes `propertyType` (Domain property vs URL prefix).
+- All GSC performance tools support optional `start_date`/`end_date` (client-side filter for trends).
+
+### MCP Verification (2026-02-18)
+- **gsc_list_sites**: 16 properties with propertyType.
+- **gsc_top_queries** (nextgenlearning.dev): 20 shown, 387 total; correct CTR/position.
+- **gsc_top_pages** (nextgenlearning.dev): 10 shown, 305 total; real page URLs.
+- **gsc_all_queries** (nextgenlearning.dev): 387 queries, source html_scraping.
+- **gsc_all_queries** (kitovo.app): 529 queries, receipt/invoice-themed.

@@ -1,57 +1,56 @@
 # Progress
 
-## ✅ COMPLETED — v0.2.0
+## ✅ COMPLETED — v0.2.1
 
 ### PyPI: https://pypi.org/project/gsc-bing-mcp/
 ### GitHub: https://github.com/codermillat/gsc-bing-mcp
 
 ---
 
-## What Works (v0.2.0)
+## What Works (v0.2.1)
 
-### GSC Tools (12 total) — batchexecute RPC (no OAuth, no GCP)
-| Tool | RPC | Status |
-|------|-----|--------|
+### Tool Count: 23 total (11 GSC + 11 Bing + 1 util)
+
+### GSC Tools (11) — batchexecute RPC (no OAuth, no GCP)
+| Tool | RPC / Source | Status |
+|------|----------------|--------|
 | `gsc_list_sites` | HTML scraping | ✅ Working — includes propertyType |
-| `gsc_performance_trend` | OLiH4d | ✅ Working — + date range support |
+| `gsc_performance_trend` | OLiH4d | ✅ Working — + client-side date range |
 | `gsc_top_queries` | nDAfwb dim=[2] | ✅ Working — + date range, limit=0 for all |
-| `gsc_top_pages` | nDAfwb dim=[4] | ✅ Working — + date range, limit=0 for all |
+| `gsc_top_pages` | nDAfwb dim=[3] | ✅ Working — + date range, limit=0; real URLs |
 | `gsc_search_analytics` | nDAfwb multi-dim | ✅ Working — + date range |
 | `gsc_site_summary` | gydQ5d | ✅ Working |
 | `gsc_list_sitemaps` | xDwXKd | ✅ Working |
 | `gsc_insights` | oGVhvf | ✅ Working |
-| `gsc_all_queries` | HTML scraping | ✅ **NEW** — scrapes all queries from performance page |
-| `gsc_index_coverage` | czrWJf | ✅ **NEW** — detailed index coverage stats |
-| `gsc_query_pages` | nDAfwb [2,4] | ✅ **NEW** — query-to-page correlations |
+| `gsc_all_queries` | HTML (ds:17) | ✅ Working — all queries from performance page |
+| `gsc_index_coverage` | czrWJf | ✅ Working — index coverage stats |
+| `gsc_query_pages` | nDAfwb [2,3] | ✅ Working — query-to-page |
 | `refresh_google_session` | — | ✅ Working |
 
-### Bing Tools (10 total)
+### Bing Tools (11)
 | Tool | Endpoint | Status |
 |------|----------|--------|
 | `bing_list_sites` | GetUserSites | ✅ Working |
 | `bing_search_analytics` | GetRankAndTrafficStats | ✅ Working |
 | `bing_keyword_stats` | GetKeywordStats | ✅ Working |
 | `bing_crawl_stats` | GetCrawlStats | ✅ Working |
-| `bing_url_info` | GetUrlInfo | ✅ **NEW** — URL inspection |
-| `bing_page_stats` | GetPageStats | ✅ **NEW** — top pages with traffic |
-| `bing_submit_url` | SubmitUrl | ✅ **NEW** — submit URL for indexing |
-| `bing_submit_url_batch` | SubmitUrlBatch | ✅ **NEW** — batch submit URLs |
-| `bing_crawl_issues` | GetCrawlIssues | ✅ **NEW** — crawl errors/issues |
-| `bing_url_submission_quota` | GetUrlSubmissionQuota | ✅ **NEW** — check quota |
-| `bing_link_counts` | GetLinkCounts | ✅ **NEW** — inbound link data |
+| `bing_url_info` | GetUrlInfo | ✅ Working |
+| `bing_page_stats` | GetPageStats | ✅ Working |
+| `bing_submit_url` | SubmitUrl | ✅ Working |
+| `bing_submit_url_batch` | SubmitUrlBatch | ✅ Working |
+| `bing_crawl_issues` | GetCrawlIssues | ✅ Working |
+| `bing_url_submission_quota` | GetUrlSubmissionQuota | ✅ Working |
+| `bing_link_counts` | GetLinkCounts | ✅ Working |
 
 ### Infrastructure
-- SAPISIDHASH auth (SHA1 based, no OAuth) ✅
-- rookiepy Chrome cookie extraction ✅
-- Multi-browser auto-detect: Chrome → Brave → Edge ✅
-- Env var overrides: `BROWSER`, `CHROME_PROFILE` ✅
-- XSRF token auto-fetch from 400 error ✅
-- batchexecute response parser (chunked streaming + wrb.fr) ✅
-- 5-minute in-memory cache for cookies + XSRF ✅
-- Robust nDAfwb parser with multi-shape unwrapping ✅
-- Date range support on GSC performance tools ✅
+- SAPISIDHASH auth, rookiepy Chrome cookie extraction ✅
+- Multi-browser: Chrome → Brave → Edge; env overrides BROWSER, CHROME_PROFILE ✅
+- XSRF token auto-fetch; batchexecute chunked parser ✅
+- nDAfwb: correct dimension codes (query=2, page=3, country=4), _extract_dim_value, metric_type int check ✅
+- Date range: client-side filter on OLiH4d results ✅
+- gsc_all_queries: scan HTML for [2] block, reuse _parse_ndafwb_breakdown ✅
 
-## Current MCP Config (Cline)
+## Current MCP Config (Cursor/Cline)
 ```json
 "gsc-bing-mcp": {
   "command": "uvx",
@@ -65,29 +64,24 @@
 ## Version History
 | Version | Date | Notes |
 |---------|------|-------|
-| 0.1.0 | 2026-02-18 | Initial release — used wrong GSC API (404s) |
-| 0.1.1 | 2026-02-18 | First batchexecute attempt (incomplete) |
-| 0.1.2 | 2026-02-18 | Full batchexecute rewrite — real data working |
-| 0.1.4 | 2026-02-18 | HTML scraping for gsc_list_sites |
-| 0.1.5 | 2026-02-18 | Fixed bing_crawl_stats list handling |
-| 0.1.6 | 2026-02-18 | Fixed query/page data extraction |
-| 0.2.0 | 2026-02-18 | **Major: 22 tools, date range, new Bing endpoints, robust parser** |
+| 0.1.0 | 2026-02-18 | Initial release |
+| 0.1.1 | 2026-02-18 | Batchexecute attempt |
+| 0.1.2–0.1.6 | 2026-02-18 | Iterative fixes |
+| 0.2.0 | 2026-02-18 | **Major: 23 tools, dimension/parser fixes, date range, new Bing** |
+| 0.2.1 | 2026-02-18 | **Bugfix: device falsy check, metric_type validation, index_coverage loop syntax** |
 
 ---
 
 ## Known Limitations
-- `nDAfwb` on very low-traffic sites may only return aggregate totals
-- Chrome must not have Cookies SQLite DB locked (close Chrome or use separate profile)
-- SAPISIDHASH is an internal Google technique — could break if Google changes auth
-- Bing API key must be manually obtained from bing.com/webmasters
-- GSC data has ~2-3 day lag
+- nDAfwb on very low-traffic sites may return limited rows
+- Chrome cookie DB must not be locked (close Chrome or use separate profile)
+- SAPISIDHASH is internal; could break if Google changes auth
+- Bing requires free API key from bing.com/webmasters
+- GSC data ~2–3 day lag
 
 ## What's Left to Build (Future)
-
-### v0.3.0 Ideas
-- `gsc_inspect_url` — URL inspection RPC (not yet discovered)
-- Firefox cookie support as fallback
-- Multi-account Google support (profile selector)
-- Export to CSV/JSON option
-- Bing feed management tools (SubmitFeed, GetFeeds)
-- Bing keyword research tools (GetRelatedKeywords)
+- gsc_inspect_url (if RPC discovered)
+- Firefox cookie fallback
+- Multi-account / profile selector
+- Export CSV/JSON
+- Bing feed / keyword research tools

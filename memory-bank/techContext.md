@@ -65,30 +65,27 @@ Each JSON array item: `["wrb.fr", "RPC_ID", "data_json_string", null, null, null
 | `xDwXKd` | Sitemaps list | `["url", 7]` |
 | `oGVhvf` | Insights/callouts | `["url"]` |
 
-### Dimension Codes (nDAfwb)
+### Dimension Codes (nDAfwb) — v0.2.0+
 ```python
 DIMENSIONS = {
     "query": [2],
-    "page": [4],
-    "country": [5],
-    "device": [6],
+    "page": [3],   # was [4] — [4] is country
+    "country": [4],
+    "device": [4], # no dedicated device code; falls back to country
     "search_appearance": [7],
-    "date": [8],  # OLiH4d uses [1] internally
+    "date": [8],
 }
 ```
+Dimension values: query at dim_info[0], page URL at dim_info[40], country at dim_info[17] (dict `{"519508101": ["code"]}`). Use `_extract_dim_value(dim_info, dim_name)`.
 
 ### Date Range Support (v0.2.0)
-- `start_date`/`end_date` params converted to `[start_ms, end_ms]` array
-- Placed at `args[2]` in the RPC call (replaces null)
-- If no dates provided, uses default period codes (27 for OLiH4d, 32 for nDAfwb)
+- GSC batchexecute does **not** accept custom date range in RPC (args[2] date filter returns empty).
+- **Client-side filtering**: Fetch full OLiH4d with period=27, then filter rows by start_date/end_date in `_filter_rows_by_date()`.
 
-### nDAfwb Parser (v0.2.0)
-Response shapes handled:
-- Shape A: `raw[1][0] = [[row], [row], ...]` — each row is `[dim, m1, m2, m3, m4]`
-- Shape B: `raw[1][0] = [[[row]], [[row]], ...]` — extra wrapper layer
-- Shape C: `raw[1] = [[row], [row], ...]` — no intermediate nesting
-
-Metric extraction: `_extract_metric_value()` scans index [1] first, then reverse-scans from end for float values.
+### nDAfwb Parser (v0.2.0+)
+Response shapes: A `raw[1][0]` list of rows; B/C with extra nesting. Unwrap then `_parse_single_row(row_data, dimensions)`.
+- **Metric extraction**: `_extract_metric_value()` — value at [1] for integers; for CTR/position (type 7/8) scan indices > 8 only (index 8 is type code, not value).
+- **Metric type**: In `_parse_single_row()`, require `isinstance(metric_array[8], int)` before comparing to 5/6/7/8.
 
 ---
 
@@ -147,11 +144,11 @@ GET  GetLinkCounts             — Inbound link counts
 ### Package Structure
 ```
 gsc_bing_mcp/
-├── __init__.py              # v0.2.0
-├── server.py                # FastMCP server — 22 tools
+├── __init__.py              # __version__ = "0.2.1"
+├── server.py                # FastMCP server — 23 tools
 ├── clients/
 │   ├── __init__.py
-│   ├── gsc_client.py        # batchexecute RPC client
+│   ├── gsc_client.py        # batchexecute RPC + HTML scraping (gsc_all_queries)
 │   └── bing_client.py       # Bing API client (11 endpoints)
 └── extractors/
     ├── __init__.py

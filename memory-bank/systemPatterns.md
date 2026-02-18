@@ -7,7 +7,7 @@ AI Agent (Claude/Cline)
      │ MCP Protocol (stdio)
      ▼
 FastMCP Server (server.py)
-     ├── GSC Tools → gsc_client.py → SAPISIDHASH auth → searchconsole.googleapis.com
+     ├── GSC Tools → gsc_client.py → SAPISIDHASH auth → search.google.com (batchexecute)
      └── Bing Tools → bing_client.py → API key auth → ssl.bing.com/webmaster/api.svc/json
                               ↑                              ↑
                     extractors/chrome_cookies.py    BING_API_KEY env var
@@ -63,21 +63,12 @@ requirements.txt           # mcp, rookiepy, httpx
 README.md
 ```
 
-## GSC API Endpoints Used
+## GSC API (batchexecute — no official API key)
 ```
-GET  https://searchconsole.googleapis.com/v1/sites
-     → Lists all verified properties
-
-POST https://searchconsole.googleapis.com/webmasters/v3/sites/{siteUrl}/searchAnalytics/query
-     Body: {"startDate", "endDate", "dimensions", "rowLimit", "startRow"}
-     → Search performance data
-
-GET  https://searchconsole.googleapis.com/webmasters/v3/sites/{siteUrl}/sitemaps
-     → Sitemaps list
-
-POST https://searchconsole.googleapis.com/v1/urlInspection/index:inspect
-     Body: {"inspectionUrl", "siteUrl"}
-     → URL inspection result
+POST https://search.google.com/_/SearchConsoleAggReportUi/data/batchexecute
+     Body: f.req=[[["rpcId","argsJson",null,"1"]]]&at=XSRF_TOKEN
+     → All GSC data via RPCs: OLiH4d (trends), nDAfwb (queries/pages/country), gydQ5d, xDwXKd, oGVhvf, czrWJf, etc.
+     → Site list via HTML scraping of search-console welcome page
 ```
 
 ## Bing API Endpoints Used
