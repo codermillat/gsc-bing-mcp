@@ -849,7 +849,7 @@ def _extract_dim_value(dim_info: list, dim_name: str) -> str | None:
         return None
 
     if dim_name == "device":
-        if dim_info[0] and isinstance(dim_info[0], str):
+        if isinstance(dim_info[0], str):
             return dim_info[0]
         return None
 
@@ -881,6 +881,8 @@ def _parse_single_row(row_data: list, dimensions: list[str]) -> dict | None:
         if not isinstance(metric_array, list) or len(metric_array) < 9:
             continue
         metric_type = metric_array[8]
+        if not isinstance(metric_type, int):
+            continue
         value = _extract_metric_value(metric_array)
 
         if metric_type == 5:

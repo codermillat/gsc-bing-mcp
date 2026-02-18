@@ -586,7 +586,8 @@ async def gsc_index_coverage(site_url: str) -> str:
 
         coverage_items = []
         if isinstance(raw, list):
-            for item in raw if not isinstance(raw[0], list) else (raw[0] if raw else []):
+            items_to_iterate = raw if not raw or not isinstance(raw[0], list) else raw[0]
+            for item in items_to_iterate:
                 if isinstance(item, list) and len(item) >= 2:
                     total = item[0] if isinstance(item[0], (int, float)) else 0
                     details = item[1] if isinstance(item[1], list) else [item[1]]
