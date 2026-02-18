@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gsc-bing-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "MCP server for Google Search Console & Bing Webmaster Tools — uses your Chrome browser session, no API keys needed"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -23,8 +23,8 @@ from .chrome_cookies import get_google_cookies, get_sapisid, build_cookie_header
 
 logger = logging.getLogger(__name__)
 
-# GSC internal API origin
-GSC_ORIGIN = "https://search.google.com"
+# GSC API origin - must match the API host for XD3 validation
+GSC_ORIGIN = "https://searchconsole.googleapis.com"
 
 # User-Agent matching Chrome to avoid bot detection
 CHROME_USER_AGENT = (
