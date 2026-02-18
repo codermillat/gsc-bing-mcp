@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gsc-bing-mcp"
+version = "0.1.0"
+description = "MCP server for Google Search Console & Bing Webmaster Tools — uses your Chrome browser session, no API keys needed"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = [
+    "mcp",
+    "google-search-console",
+    "bing-webmaster",
+    "seo",
+    "analytics",
+    "ai-agent",
+    "claude",
+    "cline",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+    "rookiepy>=0.5.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+gsc-bing-mcp = "gsc_bing_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/codermillat/gsc-bing-mcp"
+Repository = "https://github.com/codermillat/gsc-bing-mcp"
+Issues = "https://github.com/codermillat/gsc-bing-mcp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gsc_bing_mcp"]
