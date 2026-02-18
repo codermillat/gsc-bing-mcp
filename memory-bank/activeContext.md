@@ -1,58 +1,38 @@
 # Active Context
 
 ## Current Work Focus
-Building the complete `gsc-bing-mcp` Python MCP server package from scratch.
+v0.2.0 — Major enhancement: 22 tools total (12 GSC + 10 Bing), date range support, robust parser, new Bing endpoints.
 
-## Session Summary (2026-02-18)
-Completed full research and architecture planning. Now in implementation phase.
+## Session Summary (2026-02-18 — v0.2.0 Release)
 
-## Key Decisions Made This Session
+### What Changed
 
-### Authentication Strategy
-- **Google GSC**: `rookiepy` cookie extraction + SAPISIDHASH (NO Google Cloud, NO OAuth, NO API key)
-- **Bing Webmaster**: Official free API key (from bing.com/webmasters → Settings → API Access)
-- **No Playwright**: Eliminated as too heavy (300MB+ Chrome dependency)
-- **No OAuth fallback**: User explicitly rejected this — keep it simple
+#### Infrastructure Fixes
+- Fixed version mismatch (`__init__.py` was `0.1.1`, now synced to `0.2.0`)
+- Rewrote `_parse_ndafwb_breakdown()` with robust multi-row extraction
+- Added `_extract_metric_value()` helper that scans arrays for actual values instead of fragile index-based access
+- Added `_parse_single_row()` for clean row parsing with proper unwrapping of nested shapes
 
-### Distribution Strategy
-- PyPI package: `gsc-bing-mcp`
-- Users install via `uvx gsc-bing-mcp` — zero-install experience
-- Bing API key passed via `BING_API_KEY` env var in MCP config (no separate setup script)
-- Publisher maintains nothing server-side
+#### Date Range Support
+- Added `start_date` / `end_date` optional params to `query_search_analytics()`
+- Added `_date_to_timestamp_ms()` and `_build_date_filter()` helpers
+- Propagated date range params to all 4 GSC performance tools:
+  - `gsc_performance_trend`, `gsc_top_queries`, `gsc_top_pages`, `gsc_search_analytics`
 
-### Why SAPISIDHASH Over Cookie-Based Bing
-- Bing's official API key is truly free, never expires, 30-second setup
-- Using Bing cookies would be unstable internal API
-- This hybrid gives best of both worlds: zero setup for Google, stable API for Bing
+#### New GSC Tools (+3)
+- `gsc_all_queries` — Scrapes ALL queries from GSC performance page HTML (bypasses RPC pagination)
+- `gsc_index_coverage` — Detailed index coverage stats via `czrWJf` RPC
+- `gsc_query_pages` — Query-to-page correlations via multi-dimension `nDAfwb` breakdown
 
-## Next Steps (Implementation Order)
-1. Create package folder `gsc_bing_mcp/` with `__init__.py` files
-2. `extractors/chrome_cookies.py` — rookiepy wrapper + TTL cache
-3. `extractors/sapisidhash.py` — SAPISIDHASH hash generator
-4. `clients/gsc_client.py` — 4 GSC API methods
-5. `clients/bing_client.py` — 4 Bing API methods
-6. `server.py` — FastMCP server with all 10 @mcp.tool() tools
-7. `pyproject.toml` — PyPI packaging config
-8. `requirements.txt` + `README.md`
-9. Update Cline MCP settings
+#### New Bing Tools (+7)
+- `bing_url_info` — URL inspection (crawl date, HTTP status, indexed status)
+- `bing_page_stats` — Top pages with traffic metrics
+- `bing_submit_url` — Submit single URL for indexing
+- `bing_submit_url_batch` — Submit multiple URLs for indexing
+- `bing_crawl_issues` — Crawl issues and errors
+- `bing_url_submission_quota` — Check daily URL submission quota
+- `bing_link_counts` — Inbound link data
 
-## Important Patterns to Follow
-- All async functions (FastMCP supports async tools)
-- Type hints on all tool parameters (FastMCP auto-generates schema)
-- Docstrings on all tools (become MCP tool descriptions)
-- Graceful error handling with user-friendly messages
-- Cookie cache TTL = 300 seconds (5 min)
-
-## Known Risks / Watchpoints
-- SAPISIDHASH might need `__Secure-3PAPISID` instead of `SAPISID` on newer Chrome
-- GSC internal API endpoints could theoretically change (not official)
-- rookiepy may fail if Chrome is open with DB locked — add helpful error message
-- Test with actual Chrome session before declaring complete
-
-## Files Created So Far
-- `memory-bank/projectbrief.md` ✅
-- `memory-bank/productContext.md` ✅
-- `memory-bank/systemPatterns.md` ✅
-- `memory-bank/techContext.md` ✅
-- `memory-bank/activeContext.md` ✅ (this file)
-- `memory-bank/progress.md` (next)
+#### Existing Tool Improvements
+- `gsc_top_pages` — Now supports `limit=0` to return all pages
+- `gsc_list_sites` — Now includes `propertyType` (Domain property vs URL prefix)

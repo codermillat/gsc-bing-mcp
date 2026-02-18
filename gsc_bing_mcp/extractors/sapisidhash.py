@@ -23,8 +23,9 @@ from .chrome_cookies import get_google_cookies, get_sapisid, build_cookie_header
 
 logger = logging.getLogger(__name__)
 
-# GSC API origin - must match the API host for XD3 validation
-GSC_ORIGIN = "https://searchconsole.googleapis.com"
+# GSC API origin - must match the batchexecute endpoint host for XD3 validation
+# NOTE: GSC uses search.google.com NOT searchconsole.googleapis.com
+GSC_ORIGIN = "https://search.google.com"
 
 # User-Agent matching Chrome to avoid bot detection
 CHROME_USER_AGENT = (
@@ -82,12 +83,13 @@ def get_gsc_auth_headers(
         "X-Origin": origin,
         "X-Referer": origin,
         "Origin": origin,
-        "Referer": f"{origin}/search-console/",
-        "Content-Type": "application/json",
+        "Referer": f"{origin}/search-console/performance/search-analytics",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
         "User-Agent": CHROME_USER_AGENT,
         "Accept": "*/*",
         "Accept-Language": "en-US,en;q=0.9",
         "X-Goog-Authuser": "0",
+        "X-Same-Domain": "1",
     }
 
     logger.debug(f"Built GSC auth headers with SAPISIDHASH")

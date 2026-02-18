@@ -27,3 +27,24 @@ env/
 
 # PyPI credentials (never commit these!)
 .pypirc
+
+# Cursor IDE
+.cursor/
+
+# Debug/scratch scripts and HTML dumps
+debug_*.py
+discover_*.py
+discovered_*.json
+discover_*.log
+discover_output.txt
+extract_*.py
+find_*.py
+probe_*.py
+scan_*.py
+scrape_*.py
+intercept_*.py
+check_*.py
+analyze_*.py
+test_*.py
+gsc_*.html
+gsc_*.json

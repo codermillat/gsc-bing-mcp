@@ -248,3 +248,168 @@ async def get_url_info(site_url: str, page_url: str) -> dict:
     _handle_response_error(response, f"get_url_info for {page_url}")
     data = response.json()
     return data.get("d") or {}
+
+
+async def get_page_stats(site_url: str) -> list[dict]:
+    """
+    Get top page statistics for a site in Bing.
+
+    Args:
+        site_url: The site URL (e.g., "https://example.com/")
+
+    Returns:
+        List of page stat dicts with keys: Url, Impressions, Clicks, AvgClickPosition
+    """
+    api_key = get_bing_api_key()
+
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
+        response = await client.get(
+            f"{BING_API_BASE}/GetPageStats",
+            params={
+                "apikey": api_key,
+                "siteUrl": site_url,
+            },
+            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        )
+
+    _handle_response_error(response, f"get_page_stats for {site_url}")
+    data = response.json()
+    return data.get("d", []) or []
+
+
+async def submit_url(site_url: str, url: str) -> dict:
+    """
+    Submit a single URL for indexing in Bing.
+
+    Args:
+        site_url: The site URL (e.g., "https://example.com/")
+        url: The page URL to submit for indexing
+
+    Returns:
+        Response dict (empty on success)
+    """
+    api_key = get_bing_api_key()
+
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
+        response = await client.post(
+            f"{BING_API_BASE}/SubmitUrl",
+            params={"apikey": api_key},
+            json={"siteUrl": site_url, "url": url},
+            headers={"User-Agent": USER_AGENT, "Content-Type": "application/json"},
+        )
+
+    _handle_response_error(response, f"submit_url for {url}")
+    try:
+        return response.json()
+    except Exception:
+        return {"status": "submitted"}
+
+
+async def submit_url_batch(site_url: str, urls: list[str]) -> dict:
+    """
+    Submit multiple URLs for indexing in Bing.
+
+    Args:
+        site_url: The site URL (e.g., "https://example.com/")
+        urls: List of page URLs to submit for indexing
+
+    Returns:
+        Response dict (empty on success)
+    """
+    api_key = get_bing_api_key()
+
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
+        response = await client.post(
+            f"{BING_API_BASE}/SubmitUrlBatch",
+            params={"apikey": api_key},
+            json={"siteUrl": site_url, "urlList": urls},
+            headers={"User-Agent": USER_AGENT, "Content-Type": "application/json"},
+        )
+
+    _handle_response_error(response, f"submit_url_batch for {site_url}")
+    try:
+        return response.json()
+    except Exception:
+        return {"status": "submitted", "count": len(urls)}
+
+
+async def get_crawl_issues(site_url: str) -> list[dict]:
+    """
+    Get crawl issues for a site in Bing.
+
+    Args:
+        site_url: The site URL (e.g., "https://example.com/")
+
+    Returns:
+        List of crawl issue dicts
+    """
+    api_key = get_bing_api_key()
+
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
+        response = await client.get(
+            f"{BING_API_BASE}/GetCrawlIssues",
+            params={
+                "apikey": api_key,
+                "siteUrl": site_url,
+            },
+            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        )
+
+    _handle_response_error(response, f"get_crawl_issues for {site_url}")
+    data = response.json()
+    return data.get("d", []) or []
+
+
+async def get_url_submission_quota(site_url: str) -> dict:
+    """
+    Get the daily URL submission quota for a site in Bing.
+
+    Args:
+        site_url: The site URL (e.g., "https://example.com/")
+
+    Returns:
+        Dict with DailyQuota and MonthlyQuota
+    """
+    api_key = get_bing_api_key()
+
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
+        response = await client.get(
+            f"{BING_API_BASE}/GetUrlSubmissionQuota",
+            params={
+                "apikey": api_key,
+                "siteUrl": site_url,
+            },
+            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        )
+
+    _handle_response_error(response, f"get_url_submission_quota for {site_url}")
+    data = response.json()
+    return data.get("d") or {}
+
+
+async def get_link_counts(site_url: str) -> list[dict]:
+    """
+    Get inbound link counts for a site in Bing.
+
+    Args:
+        site_url: The site URL (e.g., "https://example.com/")
+
+    Returns:
+        List of link count data
+    """
+    api_key = get_bing_api_key()
+
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
+        response = await client.get(
+            f"{BING_API_BASE}/GetLinkCounts",
+            params={
+                "apikey": api_key,
+                "siteUrl": site_url,
+                "getCountsPerPage": 0,
+            },
+            headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        )
+
+    _handle_response_error(response, f"get_link_counts for {site_url}")
+    data = response.json()
+    return data.get("d", []) or []
